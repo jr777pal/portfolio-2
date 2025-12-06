@@ -37,7 +37,7 @@ const AboutSection: React.FC = () => {
             </div>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
               Passionate about creating
-              <span className="gradient-text block mt-2">digital experiences</span>
+              <span className="gradient-text block mt-2 glitch-hover" data-text="digital experiences">digital experiences</span>
             </h2>
           </div>
         </ScrollReveal>

@@ -120,7 +120,7 @@ const TestimonialsSection: React.FC = () => {
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             <span className="text-foreground">Client </span>
-            <span className="gradient-text">Testimonials</span>
+            <span className="gradient-text glitch-hover" data-text="Testimonials">Testimonials</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-mono text-sm">
             {`// What clients say about working with me`}
