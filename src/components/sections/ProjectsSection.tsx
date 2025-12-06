@@ -175,7 +175,7 @@ const ProjectsSection: React.FC = () => {
               {`> projects.fetch()`}
             </span>
             <h2 className="text-3xl md:text-5xl font-bold mt-4">
-              Featured <span className="gradient-text">Projects</span>
+              Featured <span className="gradient-text glitch-hover" data-text="Projects">Projects</span>
             </h2>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto font-mono text-sm">
               {`// A selection of projects that showcase my skills`}

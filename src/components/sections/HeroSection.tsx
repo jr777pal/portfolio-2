@@ -73,7 +73,12 @@ const HeroSection: React.FC = () => {
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight relative z-10">
               <span className="block text-foreground">Hi, I'm</span>
-              <span className="gradient-text">Alex Chen</span>
+              <span 
+                className="gradient-text glitch-hover inline-block" 
+                data-text="Alex Chen"
+              >
+                Alex Chen
+              </span>
             </h1>
 
             {/* Typewriter effect */}
@@ -94,19 +99,17 @@ const HeroSection: React.FC = () => {
               <Link to="/projects">
                 <Button
                   size="lg"
-                  className="relative overflow-hidden group bg-gradient-to-r from-accent via-primary to-pink-500 hover:opacity-90 text-primary-foreground"
+                  className="relative overflow-hidden group bg-gradient-to-r from-accent via-primary to-pink-500 hover:opacity-90 text-primary-foreground btn-glitch"
                 >
                   <span className="relative z-10">View Projects</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-primary via-pink-500 to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  {/* Shine effect */}
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-primary-foreground/20 to-transparent" />
                 </Button>
               </Link>
               
               <Button
                 variant="outline"
                 size="lg"
-                className="gradient-border bg-background hover:bg-secondary/50"
+                className="gradient-border bg-background hover:bg-secondary/50 btn-glitch"
               >
                 Download CV
               </Button>

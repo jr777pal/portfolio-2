@@ -67,7 +67,7 @@ const SkillsSection: React.FC = () => {
               {`> skills.load()`}
             </span>
             <h2 className="text-3xl md:text-5xl font-bold mt-4">
-              Skills & <span className="gradient-text">Technologies</span>
+              Skills & <span className="gradient-text glitch-hover" data-text="Technologies">Technologies</span>
             </h2>
           </div>
         </ScrollReveal>

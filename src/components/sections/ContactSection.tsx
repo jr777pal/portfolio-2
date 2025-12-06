@@ -138,7 +138,7 @@ const ContactSection: React.FC = () => {
               {`> contact.connect()`}
             </span>
             <h2 className="text-3xl md:text-5xl font-bold mt-4">
-              Let's <span className="gradient-text">Connect</span>
+              Let's <span className="gradient-text glitch-hover" data-text="Connect">Connect</span>
             </h2>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto font-mono text-sm">
               {`// Have a project in mind? Let's talk.`}
