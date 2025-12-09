@@ -11,7 +11,9 @@ import FooterSection from '@/components/sections/FooterSection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import ParticleBackground from '@/components/three/ParticleBackground';
 import IntroScreen from '@/components/ui/IntroScreen';
+import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import LikeButton from '@/components/ui/LikeButton';
+
 const CursorGlow: React.FC = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
@@ -77,21 +79,49 @@ const MatrixRain: React.FC = () => {
 
 const Portfolio: React.FC = () => {
   const [showIntro, setShowIntro] = useState(() => {
-    // Skip intro for returning visitors
     return !localStorage.getItem('portfolio_visited');
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
 
   const handleIntroComplete = () => {
     localStorage.setItem('portfolio_visited', 'true');
     setShowIntro(false);
   };
 
+  useEffect(() => {
+    // If intro is shown, wait for it to complete before showing loading
+    if (!showIntro) {
+      // Show loading skeleton briefly
+      const loadingTimer = setTimeout(() => {
+        setIsLoading(false);
+        // Small delay before showing content with animation
+        setTimeout(() => setContentReady(true), 100);
+      }, 1200);
+      return () => clearTimeout(loadingTimer);
+    }
+  }, [showIntro]);
+
+  // When intro completes, trigger loading phase
+  useEffect(() => {
+    if (!showIntro && isLoading) {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        setTimeout(() => setContentReady(true), 100);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [showIntro, isLoading]);
+
   return (
     <ThemeProvider>
       {/* Intro Screen */}
       {showIntro && <IntroScreen onComplete={handleIntroComplete} />}
+      
+      {/* Loading Skeleton */}
+      {!showIntro && isLoading && <LoadingSkeleton />}
 
-      <div className="relative min-h-screen bg-background overflow-hidden">
+      <div className={`relative min-h-screen bg-background overflow-hidden transition-opacity duration-500 ${contentReady || (!showIntro && !isLoading) ? 'opacity-100' : 'opacity-0'}`}>
         {/* Matrix rain background */}
         <MatrixRain />
         
