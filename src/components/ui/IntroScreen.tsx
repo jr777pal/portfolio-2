@@ -36,7 +36,7 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
         phase === 'fade' ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      {/* Audio elements */}
+      {/* Audio elements - blade scrape sounds */}
       <audio
         ref={bladeAudioRef}
         src="https://cdn.freesound.org/previews/500/500168_10958883-lq.mp3"
@@ -44,7 +44,7 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
       />
       <audio
         ref={swordAudioRef}
-        src="https://cdn.freesound.org/previews/319/319590_5436764-lq.mp3"
+        src="https://cdn.freesound.org/previews/240/240788_4107740-lq.mp3"
         preload="auto"
       />
 
@@ -62,56 +62,67 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
         </button>
       )}
 
-      {/* Laser cut effects during glitch - cyan/purple theme */}
+      {/* Blade slash effects during glitch */}
       {phase === 'glitch' && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Horizontal cyan laser cuts */}
-          {[...Array(6)].map((_, i) => (
+          {/* Diagonal blade slashes - like sword cuts */}
+          {[...Array(5)].map((_, i) => (
             <div
-              key={`laser-h-${i}`}
-              className="absolute h-[3px] animate-laser-horizontal"
+              key={`slash-${i}`}
+              className="absolute animate-blade-slash"
               style={{
-                top: `${15 + i * 14}%`,
-                left: '-100%',
-                width: '200%',
-                animationDelay: `${i * 0.08}s`,
-                background: 'linear-gradient(90deg, transparent, hsl(190, 95%, 50%), hsl(250, 84%, 64%), transparent)',
-                boxShadow: '0 0 20px hsl(190, 95%, 50%), 0 0 40px hsl(250, 84%, 64%), 0 0 60px hsl(190, 95%, 50%)',
+                top: `${10 + i * 18}%`,
+                left: '-10%',
+                width: '120%',
+                height: '4px',
+                transform: `rotate(${-15 + i * 8}deg)`,
+                animationDelay: `${i * 0.12}s`,
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.1) 80%, transparent 100%)',
+                boxShadow: '0 0 30px rgba(255,255,255,0.8), 0 0 60px hsl(190, 95%, 50%), 0 0 90px hsl(280, 87%, 65%)',
               }}
             />
           ))}
-          {/* Diagonal purple laser cuts */}
-          {[...Array(4)].map((_, i) => (
+          
+          {/* Cross slashes */}
+          {[...Array(3)].map((_, i) => (
             <div
-              key={`laser-d-${i}`}
-              className="absolute h-[3px] animate-laser-diagonal"
+              key={`cross-${i}`}
+              className="absolute animate-blade-slash-reverse"
               style={{
-                top: `${20 + i * 20}%`,
-                left: '-100%',
-                width: '250%',
-                transform: `rotate(${-25 + i * 15}deg)`,
-                animationDelay: `${0.1 + i * 0.1}s`,
-                background: 'linear-gradient(90deg, transparent, hsl(280, 87%, 65%), hsl(320, 87%, 60%), transparent)',
-                boxShadow: '0 0 15px hsl(280, 87%, 65%), 0 0 30px hsl(320, 87%, 60%), 0 0 45px hsl(280, 87%, 65%)',
+                top: `${25 + i * 25}%`,
+                right: '-10%',
+                width: '120%',
+                height: '3px',
+                transform: `rotate(${15 - i * 10}deg)`,
+                animationDelay: `${0.3 + i * 0.15}s`,
+                background: 'linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.1) 80%, transparent 100%)',
+                boxShadow: '0 0 25px rgba(255,255,255,0.7), 0 0 50px hsl(280, 87%, 65%), 0 0 75px hsl(320, 87%, 60%)',
               }}
             />
           ))}
-          {/* Spark particles - mixed cyan/purple */}
-          {[...Array(30)].map((_, i) => (
+
+          {/* Metal sparks from blade impacts */}
+          {[...Array(40)].map((_, i) => (
             <div
               key={`spark-${i}`}
-              className="absolute w-1.5 h-1.5 rounded-full animate-spark-burst"
+              className="absolute rounded-full animate-metal-spark"
               style={{
                 top: `${Math.random() * 100}%`,
                 left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 0.6}s`,
-                background: i % 2 === 0 ? 'hsl(190, 95%, 50%)' : 'hsl(280, 87%, 65%)',
-                boxShadow: i % 2 === 0 
-                  ? '0 0 8px hsl(190, 95%, 50%), 0 0 16px hsl(190, 95%, 50%)' 
-                  : '0 0 8px hsl(280, 87%, 65%), 0 0 16px hsl(280, 87%, 65%)',
+                width: `${2 + Math.random() * 3}px`,
+                height: `${2 + Math.random() * 3}px`,
+                animationDelay: `${0.2 + Math.random() * 0.5}s`,
+                background: i % 3 === 0 ? '#fff' : i % 3 === 1 ? 'hsl(40, 100%, 70%)' : 'hsl(190, 95%, 60%)',
+                boxShadow: `0 0 ${4 + Math.random() * 6}px currentColor`,
               }}
             />
           ))}
+
+          {/* Screen flash on impact */}
+          <div 
+            className="absolute inset-0 bg-white animate-screen-flash"
+            style={{ animationDelay: '0.1s' }}
+          />
         </div>
       )}
 
