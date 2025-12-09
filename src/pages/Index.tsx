@@ -76,12 +76,20 @@ const MatrixRain: React.FC = () => {
 };
 
 const Portfolio: React.FC = () => {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(() => {
+    // Skip intro for returning visitors
+    return !localStorage.getItem('portfolio_visited');
+  });
+
+  const handleIntroComplete = () => {
+    localStorage.setItem('portfolio_visited', 'true');
+    setShowIntro(false);
+  };
 
   return (
     <ThemeProvider>
       {/* Intro Screen */}
-      {showIntro && <IntroScreen onComplete={() => setShowIntro(false)} />}
+      {showIntro && <IntroScreen onComplete={handleIntroComplete} />}
 
       <div className="relative min-h-screen bg-background overflow-hidden">
         {/* Matrix rain background */}
