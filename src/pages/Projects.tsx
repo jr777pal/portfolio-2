@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ExternalLink, Github, ArrowLeft, Filter, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -7,6 +7,93 @@ import { Input } from '@/components/ui/input';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 
+// Matrix code rain characters (code-related symbols)
+const CODE_CHARS = [
+  '{', '}', '(', ')', '[', ']', '<', '>', '/', '\\', '|', '-', '+', '=', '*', '&', '%', '$', '#', '@', '!',
+  'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'function', 'class', 'import', 'export',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+  '=>', '&&', '||', '===', '!==', '++', '--', '::', '->', '<?', '?>', '<!--', '-->'
+];
+
+const MatrixCodeRain: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const fontSize = 14;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops: number[] = Array(columns).fill(1);
+    const chars: string[] = Array(columns).fill('').map(() => 
+      CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]
+    );
+
+    const draw = () => {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        // Get current theme
+        const isDark = document.documentElement.classList.contains('dark');
+        
+        // Gradient effect - brighter at the head
+        const gradient = ctx.createLinearGradient(0, drops[i] * fontSize - 50, 0, drops[i] * fontSize);
+        if (isDark) {
+          gradient.addColorStop(0, 'rgba(0, 255, 170, 0)');
+          gradient.addColorStop(0.5, 'rgba(0, 255, 170, 0.5)');
+          gradient.addColorStop(1, 'rgba(0, 255, 170, 1)');
+        } else {
+          gradient.addColorStop(0, 'rgba(99, 102, 241, 0)');
+          gradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.3)');
+          gradient.addColorStop(1, 'rgba(99, 102, 241, 0.8)');
+        }
+        
+        ctx.fillStyle = gradient;
+        
+        const char = chars[i];
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+        // Randomly change the character
+        if (Math.random() > 0.95) {
+          chars[i] = CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+        }
+
+        // Reset drop to top with random delay
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    };
+
+    const interval = setInterval(draw, 50);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-0 opacity-30"
+    />
+  );
+};
 const allProjects = [
   {
     id: 1,
@@ -195,12 +282,15 @@ const Projects: React.FC = () => {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* Matrix code rain background */}
+        <MatrixCodeRain />
+        
         {/* Background grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(var(--accent-rgb),0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(var(--accent-rgb),0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(var(--accent-rgb),0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(var(--accent-rgb),0.03)_1px,transparent_1px)] bg-[size:50px_50px] z-[1]" />
         
         {/* Floating orbs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-accent/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-accent/10 rounded-full blur-3xl animate-pulse z-[1]" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse z-[1]" style={{ animationDelay: '1s' }} />
 
         {/* Header */}
         <header className="fixed top-0 left-0 right-0 z-50 glass py-4">
