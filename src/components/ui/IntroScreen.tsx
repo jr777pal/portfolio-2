@@ -1,27 +1,110 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+
+const MatrixRain: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF<>{}[]!@#$%^&*';
+    const charArray = chars.split('');
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops: number[] = [];
+
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.random() * -100;
+    }
+
+    const draw = () => {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = 'hsl(190, 95%, 50%)';
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const char = charArray[Math.floor(Math.random() * charArray.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        // Random color variation between cyan and purple
+        if (Math.random() > 0.5) {
+          ctx.fillStyle = `hsl(${190 + Math.random() * 90}, 95%, ${50 + Math.random() * 20}%)`;
+        }
+
+        ctx.fillText(char, x, y);
+
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    };
+
+    const interval = setInterval(draw, 35);
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 opacity-40"
+      style={{ zIndex: 0 }}
+    />
+  );
+};
 
 const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [phase, setPhase] = useState<'waiting' | 'show' | 'glitch' | 'fade'>('waiting');
-  const bladeAudioRef = useRef<HTMLAudioElement | null>(null);
-  const swordAudioRef = useRef<HTMLAudioElement | null>(null);
+  const glitchAudioRef = useRef<HTMLAudioElement | null>(null);
+  const typeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const cyberAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const startIntro = () => {
     setPhase('show');
     
+    // Play typing sound during text reveal
+    if (typeAudioRef.current) {
+      typeAudioRef.current.volume = 0.3;
+      typeAudioRef.current.play().catch(console.error);
+    }
+    
     // Start the animation sequence
     setTimeout(() => {
       setPhase('glitch');
-      // Play both sound effects (now allowed after user interaction)
-      if (bladeAudioRef.current) {
-        bladeAudioRef.current.volume = 0.5;
-        bladeAudioRef.current.play().catch(console.error);
+      // Stop typing, play glitch sounds
+      if (typeAudioRef.current) {
+        typeAudioRef.current.pause();
+      }
+      if (glitchAudioRef.current) {
+        glitchAudioRef.current.volume = 0.5;
+        glitchAudioRef.current.play().catch(console.error);
       }
       setTimeout(() => {
-        if (swordAudioRef.current) {
-          swordAudioRef.current.volume = 0.4;
-          swordAudioRef.current.play().catch(console.error);
+        if (cyberAudioRef.current) {
+          cyberAudioRef.current.volume = 0.4;
+          cyberAudioRef.current.play().catch(console.error);
         }
-      }, 200);
+      }, 150);
     }, 800);
     
     // Fade out after glitch
@@ -36,15 +119,23 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
         phase === 'fade' ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      {/* Audio elements - cyber/glitch sounds */}
+      {/* Matrix rain background - always visible */}
+      <MatrixRain />
+
+      {/* Audio elements - cyber/hacking sounds */}
       <audio
-        ref={bladeAudioRef}
-        src="https://cdn.freesound.org/previews/521/521974_7549498-lq.mp3"
+        ref={typeAudioRef}
+        src="https://cdn.freesound.org/previews/256/256541_4772965-lq.mp3"
         preload="auto"
       />
       <audio
-        ref={swordAudioRef}
-        src="https://cdn.freesound.org/previews/387/387186_7255534-lq.mp3"
+        ref={glitchAudioRef}
+        src="https://cdn.freesound.org/previews/560/560443_7549498-lq.mp3"
+        preload="auto"
+      />
+      <audio
+        ref={cyberAudioRef}
+        src="https://cdn.freesound.org/previews/253/253886_4597795-lq.mp3"
         preload="auto"
       />
 
@@ -52,7 +143,7 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
       {phase === 'waiting' && (
         <button
           onClick={startIntro}
-          className="group relative px-12 py-6 text-2xl md:text-3xl font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:scale-105"
+          className="group relative z-10 px-12 py-6 text-2xl md:text-3xl font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:scale-105"
           style={{ fontFamily: "'Orbitron', sans-serif" }}
         >
           <span className="relative z-10 gradient-text">CLICK TO ENTER</span>
@@ -64,7 +155,7 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
 
       {/* Blade slash effects during glitch */}
       {phase === 'glitch' && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
           {/* Diagonal blade slashes - like sword cuts */}
           {[...Array(5)].map((_, i) => (
             <div
@@ -101,19 +192,19 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
             />
           ))}
 
-          {/* Metal sparks from blade impacts */}
+          {/* Digital fragments/sparks */}
           {[...Array(40)].map((_, i) => (
             <div
               key={`spark-${i}`}
-              className="absolute rounded-full animate-metal-spark"
+              className="absolute rounded-sm animate-metal-spark"
               style={{
                 top: `${Math.random() * 100}%`,
                 left: `${Math.random() * 100}%`,
-                width: `${2 + Math.random() * 3}px`,
-                height: `${2 + Math.random() * 3}px`,
+                width: `${2 + Math.random() * 4}px`,
+                height: `${2 + Math.random() * 4}px`,
                 animationDelay: `${0.2 + Math.random() * 0.5}s`,
-                background: i % 3 === 0 ? '#fff' : i % 3 === 1 ? 'hsl(40, 100%, 70%)' : 'hsl(190, 95%, 60%)',
-                boxShadow: `0 0 ${4 + Math.random() * 6}px currentColor`,
+                background: i % 3 === 0 ? 'hsl(190, 95%, 60%)' : i % 3 === 1 ? 'hsl(280, 87%, 65%)' : '#fff',
+                boxShadow: `0 0 ${4 + Math.random() * 8}px currentColor`,
               }}
             />
           ))}
@@ -128,7 +219,7 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
 
       {/* Welcome text - shown during 'show' and 'glitch' phases */}
       {(phase === 'show' || phase === 'glitch') && (
-        <div className="relative text-center select-none">
+        <div className="relative text-center select-none z-10">
           {/* WELCOME TO MY - glitches right to left */}
           <h1
             className={`text-3xl md:text-5xl lg:text-7xl font-black tracking-[0.2em] uppercase mb-4 text-foreground transition-all duration-200 ${
@@ -186,7 +277,7 @@ const IntroScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
       )}
 
       {/* Scanlines overlay */}
-      <div className="absolute inset-0 bg-scanlines opacity-5 pointer-events-none" />
+      <div className="absolute inset-0 bg-scanlines opacity-5 pointer-events-none z-30" />
     </div>
   );
 };
